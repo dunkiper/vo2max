@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VO2MAX Calculator</string>
+    <string name="app_title">VO2MAX Calculator</string>
+    <string name="app_description">Calculate your maximum oxygen uptake after a 2 km walk</string>
+</resources>
