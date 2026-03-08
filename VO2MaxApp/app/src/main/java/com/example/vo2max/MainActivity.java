@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
             double weight = parseDouble(weightInput.getText().toString());
             double height = parseDouble(heightInput.getText().toString());
             double heartRate = parseDouble(heartRateInput.getText().toString());
-            double time = parseDouble(timeInput.getText().toString());
+            double time = parseTimeInput(timeInput.getText().toString());
 
             if (Double.isNaN(age) || Double.isNaN(weight) || Double.isNaN(height) ||
                     Double.isNaN(heartRate) || Double.isNaN(time)) {
@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
 
             // Display result
             String gender = isMale ? "Male" : "Female";
+            String timeDisplay = formatTimeFromDecimal(time);
             String result = String.format(
                     "VO2MAX Calculation Results\n\n" +
                     "Gender: %s\n" +
@@ -89,10 +90,10 @@ public class MainActivity extends Activity {
                     "Weight: %.1f kg\n" +
                     "Height: %.2f m\n" +
                     "Heart Rate: %.0f bpm\n" +
-                    "Walking Time: %.2f minutes\n" +
+                    "Walking Time: %s\n" +
                     "BMI: %.2f\n\n" +
                     "VO2MAX: %.2f ml·kg^-1·min^-1",
-                    gender, age, weight, height, heartRate, time, bmi, vo2max
+                    gender, age, weight, height, heartRate, timeDisplay, bmi, vo2max
             );
             resultTextView.setText(result);
 
@@ -107,5 +108,43 @@ public class MainActivity extends Activity {
         } catch (NumberFormatException e) {
             return Double.NaN;
         }
+    }
+
+    private double parseTimeInput(String value) {
+        try {
+            if (value.contains(":")) {
+                // Parse mm:ss format
+                String[] parts = value.split(":");
+                if (parts.length != 2) {
+                    return Double.NaN;
+                }
+                int minutes = Integer.parseInt(parts[0].trim());
+                int seconds = Integer.parseInt(parts[1].trim());
+                
+                if (seconds < 0 || seconds >= 60) {
+                    return Double.NaN;
+                }
+                
+                return minutes + (seconds / 60.0);
+            } else {
+                // Fall back to decimal format for backward compatibility
+                return Double.parseDouble(value);
+            }
+        } catch (NumberFormatException e) {
+            return Double.NaN;
+        }
+    }
+
+    private String formatTimeFromDecimal(double decimalMinutes) {
+        int minutes = (int) decimalMinutes;
+        int seconds = (int) Math.round((decimalMinutes - minutes) * 60);
+        
+        // Handle case where rounding brings seconds to 60
+        if (seconds == 60) {
+            minutes++;
+            seconds = 0;
+        }
+        
+        return String.format("%d:%02d", minutes, seconds);
     }
 }

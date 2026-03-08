@@ -113,13 +113,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Walking Time (minutes)"
+                android:text="Walking Time (mm:ss)"
                 android:layout_marginTop="15dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(2 km walk time in decimal, e.g., 15 min 45 s = 15.75)"
+                android:text="(2 km walk time, e.g., 15:45 for 15 minutes 45 seconds)"
                 android:textSize="12sp"
                 android:layout_marginBottom="5dp" />
 
@@ -127,8 +127,8 @@
                 android:id="@+id/timeInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:hint="e.g., 16.5" />
+                android:inputType="text"
+                android:hint="e.g., 16:30" />
 
             <!-- Calculate Button -->
             <Button
