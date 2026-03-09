@@ -1,6 +1,7 @@
 package com.example.vo2max;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,11 +20,24 @@ public class MainActivity extends Activity {
     private EditText timeInput;
     private Button calculateBtn;
     private TextView resultTextView;
+    private SharedPreferences sharedPreferences;
+
+    private static final String PREFS_NAME = "VO2MaxPrefs";
+    private static final String PREF_GENDER = "gender";
+    private static final String PREF_AGE = "age";
+    private static final String PREF_WEIGHT = "weight";
+    private static final String PREF_HEIGHT = "height";
+    private static final String PREF_HEART_RATE = "heartRate";
+    private static final String PREF_TIME = "time";
+    private static final String PREF_RESULT = "result";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Initialize views
         genderRadioGroup = (RadioGroup) findViewById(R.id.genderRadioGroup);
@@ -34,6 +48,9 @@ public class MainActivity extends Activity {
         timeInput = (EditText) findViewById(R.id.timeInput);
         calculateBtn = (Button) findViewById(R.id.calculateBtn);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
+
+        // Load saved values
+        loadSavedValues();
 
         calculateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,5 +163,58 @@ public class MainActivity extends Activity {
         }
         
         return String.format("%d:%02d", minutes, seconds);
+    }
+
+    private void loadSavedValues() {
+        // Load gender
+        int savedGender = sharedPreferences.getInt(PREF_GENDER, -1);
+        if (savedGender != -1) {
+            genderRadioGroup.check(savedGender);
+        }
+
+        // Load text input fields
+        String savedAge = sharedPreferences.getString(PREF_AGE, "");
+        String savedWeight = sharedPreferences.getString(PREF_WEIGHT, "");
+        String savedHeight = sharedPreferences.getString(PREF_HEIGHT, "");
+        String savedHeartRate = sharedPreferences.getString(PREF_HEART_RATE, "");
+        String savedTime = sharedPreferences.getString(PREF_TIME, "");
+
+        ageInput.setText(savedAge);
+        weightInput.setText(savedWeight);
+        heightInput.setText(savedHeight);
+        heartRateInput.setText(savedHeartRate);
+        timeInput.setText(savedTime);
+
+        // Load and display previous result
+        String savedResult = sharedPreferences.getString(PREF_RESULT, "");
+        if (!savedResult.isEmpty()) {
+            resultTextView.setText(savedResult);
+        }
+    }
+
+    private void saveSavedValues() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Save gender
+        int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
+        editor.putInt(PREF_GENDER, selectedGenderId);
+
+        // Save text input fields
+        editor.putString(PREF_AGE, ageInput.getText().toString());
+        editor.putString(PREF_WEIGHT, weightInput.getText().toString());
+        editor.putString(PREF_HEIGHT, heightInput.getText().toString());
+        editor.putString(PREF_HEART_RATE, heartRateInput.getText().toString());
+        editor.putString(PREF_TIME, timeInput.getText().toString());
+
+        // Save result
+        editor.putString(PREF_RESULT, resultTextView.getText().toString());
+
+        editor.apply();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveSavedValues();
     }
 }
