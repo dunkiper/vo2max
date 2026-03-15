@@ -3,6 +3,9 @@ package com.example.vo2max;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -97,22 +100,48 @@ public class MainActivity extends Activity {
                 vo2max = 116.2 - (2.98 * time) - (0.11 * heartRate) - (0.14 * age) - (0.39 * bmi);
             }
 
-            // Display result
+            // Display result with two sections
             String gender = isMale ? "Male" : "Female";
             String timeDisplay = formatTimeFromDecimal(time);
-            String result = String.format(
-                    "VO2MAX Calculation Results\n\n" +
+            
+            // Input data section
+            String inputData = String.format(
+                    "INPUT DATA\n\n" +
                     "Gender: %s\n" +
                     "Age: %.1f years\n" +
                     "Weight: %.1f kg\n" +
                     "Height: %.2f m\n" +
                     "Heart Rate: %.0f bpm\n" +
                     "Walking Time: %s\n" +
-                    "BMI: %.2f\n\n" +
-                    "VO2MAX: %.2f ml·kg^-1·min^-1",
-                    gender, age, weight, height, heartRate, timeDisplay, bmi, vo2max
+                    "BMI: %.2f\n\n",
+                    gender, age, weight, height, heartRate, timeDisplay, bmi
             );
-            resultTextView.setText(result);
+            
+            // Final result section
+            String finalResult = String.format(
+                    "FINAL RESULT\n\n" +
+                    "VO2MAX: %.2f ml·kg⁻¹·min⁻¹",
+                    vo2max
+            );
+            
+            // Combine both sections
+            String fullResult = inputData + finalResult;
+            SpannableString spannableResult = new SpannableString(fullResult);
+            
+            // Find the start of the final result section
+            int finalResultStart = fullResult.indexOf("FINAL RESULT");
+            int vo2maxValueStart = fullResult.indexOf("VO2MAX: ") + "VO2MAX: ".length();
+            int vo2maxValueEnd = fullResult.length();
+            
+            // Apply larger font size to final result section (1.3x)
+            spannableResult.setSpan(
+                    new RelativeSizeSpan(1.3f),
+                    finalResultStart,
+                    vo2maxValueEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+            
+            resultTextView.setText(spannableResult);
 
         } catch (Exception e) {
             resultTextView.setText("Error: " + e.getMessage());
